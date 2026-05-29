@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import Quiz from './components/Quiz.tsx';
 import Result from './components/Result.tsx';
 import { QuizData, AnalysisResult } from './types';
+import { LOCAL_SCENARIOS, calculateLocalAnalysis } from './data/quizFallback.ts';
 
 const TRANSLATIONS = {
   zh: {
@@ -187,7 +188,10 @@ export default function App() {
         return res.json();
       })
       .then((data) => setQuizData(data))
-      .catch((err) => setError(err.message));
+      .catch((err) => {
+        console.warn('Backend API quiz query failed. Using client-side local fallback:', err.message);
+        setQuizData({ scenarios: LOCAL_SCENARIOS });
+      });
   }, []);
 
   const handleComplete = (answers: Record<number, string>) => {
@@ -207,8 +211,15 @@ export default function App() {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.message);
-        setLoading(false);
+        console.warn('Backend API analyze query failed. Generating high-fidelity client-side local analysis:', err.message);
+        try {
+          const localData = calculateLocalAnalysis(answers, lang);
+          setAnalysis(localData);
+          setLoading(false);
+        } catch (localErr: any) {
+          setError(err.message || localErr.message);
+          setLoading(false);
+        }
       });
   };
 
