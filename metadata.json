@@ -1,0 +1,6 @@
+{
+  "name": "文学人格拓印",
+  "description": "通过情景分析寻找与你共鸣的经典文学人格，并以图表呈现性格维度。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
